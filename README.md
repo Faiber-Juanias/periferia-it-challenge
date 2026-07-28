@@ -167,20 +167,71 @@ Spring ni BD — posible gracias a la arquitectura hexagonal.
 
 ---
 
-## Cobertura de requisitos
+## Cumplimiento de requisitos (validación cruzada)
 
-| Requisito | Dónde |
-|---|---|
-| Autenticación JWT | auth-service · `POST /auth/login` |
-| Ver / crear publicaciones | logic-service · `GET/POST /posts` |
-| Likes + tiempo real (WebSocket) | `POST /posts/{id}/likes` + STOMP `/topic/posts.likes` |
-| Ver perfil | `GET /users/me` |
-| Seeder usuarios + 1 post c/u | `database/init.sql` |
-| Postgres + ORM + ≥2 procedures | JPA + `sp_create_post`, `sp_toggle_like` |
-| Dockerización + docker-compose | `Dockerfile` x3 + `docker-compose.yml` |
-| NgRx SignalStore (singleton + signals) | `AuthStore`, `PostsStore` |
-| Swagger `/docs` | ambos servicios |
-| Pruebas unitarias · manejo de errores · observabilidad | JUnit/Mockito · `@RestControllerAdvice` · Actuator |
+Contraste de cada requisito del enunciado contra lo implementado, con su ubicación
+en el código para su verificación.
+
+### Alcance funcional
+
+| Requisito | Estado | Dónde |
+|---|---|---|
+| Autenticación (usuario y clave) | ✅ | `POST /auth/login` + BCrypt |
+| Ver publicaciones (de otros usuarios) | ✅ | `GET /posts` + pantalla Publicaciones |
+| Crear publicación (mensaje, usuario, fecha) | ✅ | `POST /posts` (autor del JWT, fecha default en BD) |
+| Ver perfil (Nombres, Apellidos, F. nacimiento, Alias) | ✅ | `GET /users/me` + pantalla Perfil |
+| Dar likes y verlos en tiempo real (mqtt ó websocket) | ✅ | WebSocket/STOMP → `/topic/posts.likes` |
+
+### Backend (Spring Boot)
+
+| Requisito | Estado | Nota |
+|---|---|---|
+| Autenticación: login con JWT | ✅ | El enunciado sugiere `GET`; se usa `POST` (buena práctica: credenciales fuera de la URL) |
+| Crear publicación (POST) | ✅ | `POST /posts` |
+| Listar publicaciones (GET) | ✅ | `GET /posts` |
+| Envío de like (POST) | ✅ | `POST /posts/{postId}/likes` |
+| Ver perfil (GET) | ✅ | `GET /users/me` |
+| Seeder: usuarios de prueba + 1 publicación c/u | ✅ | `database/init.sql` (automático en Docker) |
+| Contenedores: Dockerizar los microservicios | ✅ | `Dockerfile` en cada servicio |
+
+### Base de datos
+
+| Requisito | Estado | Dónde |
+|---|---|---|
+| PostgreSQL + ORM | ✅ | JPA / Hibernate |
+| Mínimo 2 `PROCEDURE` PL/pgSQL | ✅ | `sp_create_post`, `sp_toggle_like` (+ funciones `fn_post_like_count`, `fn_get_profile`) |
+
+### Frontend
+
+| Requisito | Estado | Dónde |
+|---|---|---|
+| Pantalla de Login | ✅ | `features/login` |
+| Pantalla de Perfil | ✅ | `features/profile` |
+| Pantalla de Publicaciones (lista + like + total) | ✅ | `features/posts` |
+| Crear publicación (mensaje + fecha default) | ✅ | `features/posts` (fecha en BD) |
+| Manejo de estado: NgRx SignalStore (Singleton + Signals) | ✅ | `AuthStore`, `PostsStore` (`providedIn: 'root'`) |
+
+### Extras valorados
+
+| Extra | Estado | Dónde |
+|---|---|---|
+| Uso de TypeScript y Java | ✅ | Frontend TS · Backend Java 21 |
+| Documentación en Swagger (`/docs` por servicio) | ✅ | springdoc-openapi |
+| Pruebas unitarias de código | ✅ | Backend: JUnit + Mockito (capa de aplicación). Frontend: spec base |
+| Manejo de errores con buenas prácticas | ✅ | `@RestControllerAdvice` en ambos servicios |
+| Logs y auditoría en los microservicios | ✅ | SLF4J + tabla `social.like_audit` |
+| Observabilidad | ✅ | Spring Boot Actuator (`/health`, `/info`, `/metrics`) |
+
+### Entregables
+
+| Entregable | Estado | Dónde                                                    |
+|---|---|----------------------------------------------------------|
+| Repositorio con backend y frontend | ✅ | Este repositorio (monorepo)                              |
+| Docker Compose | ✅ | `docker-compose.yml`                                     |
+| Script BD con usuarios predefinidos | ✅ | `database/init.sql`                                      |
+| Documentación Swagger | ✅ | `/docs` en cada servicio                                 |
+| PDF de instalación y explicación | ✅ | El archivo `instalación-y-explicación-proyecto-teli.pdf` |
+| Video demostrativo | 📎 | Adjunto a la entrega                                     |
 
 ## Notas de diseño
 
