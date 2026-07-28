@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Test WebSocket - Likes en tiempo real</title>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7/bundles/stomp.umd.min.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; }
+    #status { font-weight: bold; }
+    #log { background: #111; color: #0f0; padding: 1rem; height: 320px; overflow-y: auto;
+           white-space: pre-wrap; border-radius: 8px; font-family: monospace; }
+    input { width: 380px; padding: 4px; }
+    button { padding: 6px 12px; }
+  </style>
+</head>
+<body>
+  <h2>Test de likes en tiempo real (STOMP /topic/posts.likes)</h2>
+
+  <p>
+    Endpoint SockJS:
+    <input id="url" value="http://localhost:8082/ws" />
+    <button id="connectBtn" onclick="connect()">Conectar</button>
+    <button onclick="disconnect()">Desconectar</button>
+  </p>
+  <p>Estado: <span id="status">desconectado</span></p>
+
+  <div id="log"></div>
+
+  <script>
+    let client = null;
+
+    function log(msg) {
+      const el = document.getElementById('log');
+      el.textContent += `[${new Date().toLocaleTimeString()}] ${msg}\n`;
+      el.scrollTop = el.scrollHeight;
+    }
+
+    function connect() {
+      const url = document.getElementById('url').value;
+      client = new StompJs.Client({
+        webSocketFactory: () => new SockJS(url),
+        reconnectDelay: 3000,
+        onConnect: () => {
+          document.getElementById('status').textContent = 'CONECTADO';
+          log('Conectado. Suscrito a /topic/posts.likes');
+          client.subscribe('/topic/posts.likes', (message) => {
+            const evt = JSON.parse(message.body);
+            log('EVENTO -> postId=' + evt.postId + '  likeCount=' + evt.likeCount);
+          });
+        },
+        onStompError: (frame) => log('STOMP ERROR: ' + frame.headers['message']),
+        onWebSocketError: (e) => log('WS ERROR: revisa CORS/allowed-origins y que el servicio esté arriba'),
+      });
+      client.activate();
+    }
+
+    function disconnect() {
+      if (client) {
+        client.deactivate();
+        document.getElementById('status').textContent = 'desconectado';
+        log('Desconectado.');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+{
+  "info": {
+    "_postman_id": "b7f1a2c4-1a11-4e2a-9c01-auth00000001",
+    "name": "PeriferiaIT - Auth Service",
+    "description": "Colección del microservicio de autenticación (periferiait-auth-service, puerto 8081).\n\nOrden sugerido:\n1. Login  -> guarda el JWT en la variable GLOBAL `authToken` (reutilizable por el logic-service).\n2. Get Profile (usa el token).\n\nUsuarios seed (password para todos: Periferia123*): jdoe, mgarcia, crodriguez, alopez, dmartinez.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "const res = pm.response.json();",
+              "if (res.accessToken) {",
+              "  pm.globals.set('authToken', res.accessToken);",
+              "  pm.collectionVariables.set('authToken', res.accessToken);",
+              "  pm.environment.set('authToken', res.accessToken);",
+              "  console.log('JWT guardado en la variable global authToken');",
+              "  pm.test('Devuelve accessToken', function () { pm.expect(res.accessToken).to.be.a('string'); });",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}"
+        },
+        "url": {
+          "raw": "{{authBaseUrl}}/auth/login",
+          "host": ["{{authBaseUrl}}"],
+          "path": ["auth", "login"]
+        },
+        "description": "Autentica un usuario y devuelve un JWT (HS256). Endpoint público."
+      }
+    },
+    {
+      "name": "Get Profile (me)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{authToken}}" }
+        ],
+        "url": {
+          "raw": "{{authBaseUrl}}/users/me",
+          "host": ["{{authBaseUrl}}"],
+          "path": ["users", "me"]
+        },
+        "description": "Devuelve el perfil del usuario autenticado (requiere Bearer token)."
+      }
+    },
+    {
+      "name": "Health (actuator)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{authBaseUrl}}/actuator/health",
+          "host": ["{{authBaseUrl}}"],
+          "path": ["actuator", "health"]
+        },
+        "description": "Estado del servicio (observabilidad)."
+      }
+    }
+  ],
+  "variable": [
+    { "key": "authBaseUrl", "value": "http://localhost:8081" },
+    { "key": "username", "value": "jdoe" },
+    { "key": "password", "value": "Periferia123*" },
+    { "key": "authToken", "value": "" }
+  ]
+}
