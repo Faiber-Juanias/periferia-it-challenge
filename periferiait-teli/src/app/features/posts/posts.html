@@ -1,0 +1,60 @@
+<div class="max-w-2xl mx-auto px-4 py-8">
+  <h1 class="text-2xl font-bold text-gray-900 mb-6">Publicaciones</h1>
+
+  <!-- Crear publicación -->
+  <form [formGroup]="form" (ngSubmit)="publish()" class="bg-white rounded-2xl shadow p-4 mb-8">
+    <textarea
+      formControlName="message"
+      rows="3"
+      placeholder="¿Qué estás pensando?"
+      class="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+    ></textarea>
+    <div class="flex justify-end mt-3">
+      <button
+        type="submit"
+        [disabled]="publishing()"
+        class="rounded-lg bg-indigo-600 text-white font-medium px-5 py-2 hover:bg-indigo-700 disabled:opacity-60 transition"
+      >
+        {{ publishing() ? 'Publicando…' : 'Publicar' }}
+      </button>
+    </div>
+  </form>
+
+  <!-- Estado -->
+  @if (postsStore.loading()) {
+    <p class="text-gray-500">Cargando publicaciones…</p>
+  } @else if (postsStore.error()) {
+    <p class="text-red-600">{{ postsStore.error() }}</p>
+  }
+
+  <!-- Lista -->
+  <div class="space-y-4">
+    @for (post of postsStore.posts(); track post.id) {
+      <article class="bg-white rounded-2xl shadow p-5">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="h-9 w-9 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold uppercase">
+            {{ post.authorAlias.charAt(0) }}
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-gray-900">&#64;{{ post.authorAlias }}</p>
+            <p class="text-xs text-gray-400">{{ post.createdAt | date: 'short' }}</p>
+          </div>
+        </div>
+
+        <p class="text-gray-800 whitespace-pre-wrap mb-4">{{ post.message }}</p>
+
+        <button
+          (click)="like(post.id)"
+          class="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-red-600 transition"
+        >
+          <span class="text-lg">❤</span>
+          <span class="font-medium">{{ post.likeCount }}</span>
+        </button>
+      </article>
+    } @empty {
+      @if (!postsStore.loading()) {
+        <p class="text-gray-500">Aún no hay publicaciones. ¡Sé el primero!</p>
+      }
+    }
+  </div>
+</div>

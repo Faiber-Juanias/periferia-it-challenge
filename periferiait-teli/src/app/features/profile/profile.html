@@ -1,0 +1,42 @@
+<div class="max-w-lg mx-auto px-4 py-8">
+  <h1 class="text-2xl font-bold text-gray-900 mb-6">Mi perfil</h1>
+
+  @if (user(); as u) {
+    <div class="bg-white rounded-2xl shadow p-6">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="h-14 w-14 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xl font-bold uppercase">
+          {{ u.alias.charAt(0) }}
+        </div>
+        <div>
+          <p class="text-lg font-semibold text-gray-900">{{ u.firstName }} {{ u.lastName }}</p>
+          <p class="text-sm text-indigo-600">&#64;{{ u.alias }}</p>
+        </div>
+      </div>
+
+      <dl class="grid grid-cols-1 gap-3 text-sm">
+        <div class="flex justify-between border-b border-gray-100 pb-2">
+          <dt class="text-gray-500">Usuario</dt>
+          <dd class="text-gray-900 font-medium">{{ u.username }}</dd>
+        </div>
+        <div class="flex justify-between border-b border-gray-100 pb-2">
+          <dt class="text-gray-500">Nombres</dt>
+          <dd class="text-gray-900 font-medium">{{ u.firstName }}</dd>
+        </div>
+        <div class="flex justify-between border-b border-gray-100 pb-2">
+          <dt class="text-gray-500">Apellidos</dt>
+          <dd class="text-gray-900 font-medium">{{ u.lastName }}</dd>
+        </div>
+        <div class="flex justify-between border-b border-gray-100 pb-2">
+          <dt class="text-gray-500">Fecha de nacimiento</dt>
+          <dd class="text-gray-900 font-medium">{{ u.birthDate | date: 'longDate' }}</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-gray-500">Alias</dt>
+          <dd class="text-gray-900 font-medium">&#64;{{ u.alias }}</dd>
+        </div>
+      </dl>
+    </div>
+  } @else {
+    <p class="text-gray-500">Cargando perfil…</p>
+  }
+</div>

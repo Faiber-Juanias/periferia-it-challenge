@@ -1,12 +1,18 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { AuthStore } from './core/auth/auth.store';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './app.html',
-  styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('periferiait-teli');
+  private readonly router = inject(Router);
+  protected readonly authStore = inject(AuthStore);
+
+  logout(): void {
+    this.authStore.logout();
+    this.router.navigate(['/login']);
+  }
 }
