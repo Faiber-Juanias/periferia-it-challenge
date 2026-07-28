@@ -9,6 +9,7 @@ spring:
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:post1842}
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: validate
     open-in-view: false
@@ -23,6 +24,11 @@ security:
 
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200,http://localhost:8000}
+
+# Swagger UI accesible en /docs (springdoc genera el spec desde los controllers)
+springdoc:
+  swagger-ui:
+    path: /docs
 
 management:
   endpoints:

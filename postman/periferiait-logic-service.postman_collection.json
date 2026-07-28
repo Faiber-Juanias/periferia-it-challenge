@@ -1,126 +1,176 @@
 {
   "info": {
-    "_postman_id": "c8a2b3d5-2b22-4f3b-8d02-logic0000001",
-    "name": "PeriferiaIT - Logic Service",
+    "_postman_id": "dd7ee6f8-2149-4c97-9a0e-71a05938de2c",
+    "name": "periferiait-logic-service",
     "description": "Colección del microservicio de publicaciones y likes (periferiait-logic-service, puerto 8082).\n\nRequiere un JWT válido. Ejecuta primero 'Login' en la colección Auth Service: guarda el token en la variable GLOBAL `authToken` que estas requests reutilizan.\n\nFlujo sugerido:\n1. List Posts   -> guarda el id del primer post en `postId`.\n2. Create Post  -> guarda el id del nuevo post en `postId`.\n3. Toggle Like  -> da/quita like a `postId` (difunde el nuevo total por WebSocket /topic/posts.likes).",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "36696823"
   },
   "item": [
     {
-      "name": "List Posts",
-      "event": [
+      "name": "posts",
+      "item": [
         {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
-              "const posts = pm.response.json();",
-              "if (Array.isArray(posts) && posts.length > 0) {",
-              "  pm.globals.set('postId', posts[0].id);",
-              "  pm.collectionVariables.set('postId', posts[0].id);",
-              "  console.log('postId =', posts[0].id);",
-              "}"
-            ]
-          }
-        }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [
-          { "key": "Authorization", "value": "Bearer {{authToken}}" }
-        ],
-        "url": {
-          "raw": "{{logicBaseUrl}}/posts",
-          "host": ["{{logicBaseUrl}}"],
-          "path": ["posts"]
+          "name": "/",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const posts = pm.response.json();",
+                  "if (Array.isArray(posts) && posts.length > 0) {",
+                  "  pm.globals.set('postId', posts[0].id);",
+                  "  pm.collectionVariables.set('postId', posts[0].id);",
+                  "  console.log('postId =', posts[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{logicBaseUrl}}/posts",
+              "host": [
+                "{{logicBaseUrl}}"
+              ],
+              "path": [
+                "posts"
+              ]
+            },
+            "description": "Lista todas las publicaciones con su total de likes (requiere Bearer token)."
+          },
+          "response": []
         },
-        "description": "Lista todas las publicaciones con su total de likes (requiere Bearer token)."
-      }
+        {
+          "name": "/",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "const post = pm.response.json();",
+                  "if (post.id) {",
+                  "  pm.globals.set('postId', post.id);",
+                  "  pm.collectionVariables.set('postId', post.id);",
+                  "  console.log('Nuevo postId =', post.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Publicación de prueba desde Postman 🚀\"\n}"
+            },
+            "url": {
+              "raw": "{{logicBaseUrl}}/posts",
+              "host": [
+                "{{logicBaseUrl}}"
+              ],
+              "path": [
+                "posts"
+              ]
+            },
+            "description": "Crea una publicación. El autor se toma del JWT y la fecha la asigna la BD por defecto."
+          },
+          "response": []
+        },
+        {
+          "name": "likes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const res = pm.response.json();",
+                  "pm.test('Devuelve likeCount', function () { pm.expect(res.likeCount).to.be.a('number'); });",
+                  "console.log('Total de likes =', res.likeCount);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{logicBaseUrl}}/posts/{{postId}}/likes",
+              "host": [
+                "{{logicBaseUrl}}"
+              ],
+              "path": [
+                "posts",
+                "{{postId}}",
+                "likes"
+              ]
+            },
+            "description": "Da o quita like a la publicación `postId` y devuelve el total actualizado (procedure sp_toggle_like). El nuevo total se difunde por WebSocket."
+          },
+          "response": []
+        }
+      ]
     },
     {
-      "name": "Create Post",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
-              "const post = pm.response.json();",
-              "if (post.id) {",
-              "  pm.globals.set('postId', post.id);",
-              "  pm.collectionVariables.set('postId', post.id);",
-              "  console.log('Nuevo postId =', post.id);",
-              "}"
-            ]
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [
-          { "key": "Content-Type", "value": "application/json" },
-          { "key": "Authorization", "value": "Bearer {{authToken}}" }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"message\": \"Publicación de prueba desde Postman 🚀\"\n}"
-        },
-        "url": {
-          "raw": "{{logicBaseUrl}}/posts",
-          "host": ["{{logicBaseUrl}}"],
-          "path": ["posts"]
-        },
-        "description": "Crea una publicación. El autor se toma del JWT y la fecha la asigna la BD por defecto."
-      }
-    },
-    {
-      "name": "Toggle Like",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
-              "const res = pm.response.json();",
-              "pm.test('Devuelve likeCount', function () { pm.expect(res.likeCount).to.be.a('number'); });",
-              "console.log('Total de likes =', res.likeCount);"
-            ]
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [
-          { "key": "Authorization", "value": "Bearer {{authToken}}" }
-        ],
-        "url": {
-          "raw": "{{logicBaseUrl}}/posts/{{postId}}/likes",
-          "host": ["{{logicBaseUrl}}"],
-          "path": ["posts", "{{postId}}", "likes"]
-        },
-        "description": "Da o quita like a la publicación `postId` y devuelve el total actualizado (procedure sp_toggle_like). El nuevo total se difunde por WebSocket."
-      }
-    },
-    {
-      "name": "Health (actuator)",
+      "name": "health",
       "request": {
         "method": "GET",
         "header": [],
         "url": {
           "raw": "{{logicBaseUrl}}/actuator/health",
-          "host": ["{{logicBaseUrl}}"],
-          "path": ["actuator", "health"]
+          "host": [
+            "{{logicBaseUrl}}"
+          ],
+          "path": [
+            "actuator",
+            "health"
+          ]
         },
         "description": "Estado del servicio (observabilidad)."
-      }
+      },
+      "response": []
     }
   ],
   "variable": [
-    { "key": "logicBaseUrl", "value": "http://localhost:8082" },
-    { "key": "authToken", "value": "" },
-    { "key": "postId", "value": "" }
+    {
+      "key": "logicBaseUrl",
+      "value": "http://localhost:8082"
+    },
+    {
+      "key": "authToken",
+      "value": ""
+    },
+    {
+      "key": "postId",
+      "value": ""
+    }
   ]
 }

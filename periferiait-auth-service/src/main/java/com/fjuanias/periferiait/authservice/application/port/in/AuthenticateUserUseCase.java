@@ -4,4 +4,5 @@ package com.fjuanias.periferiait.authservice.application.port.in;
 public interface AuthenticateUserUseCase {
 
   AuthenticationResult authenticate(AuthenticateCommand command);
+  
 }

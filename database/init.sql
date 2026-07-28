@@ -1,6 +1,6 @@
 -- =============================================================================
 --  Prueba Técnica Full Stack - PeriferiaIT
---  Red social con Angular 22 + Spring Boot 3
+--  Red social "Teli" con Angular 22 + Spring Boot 3
 --
 --  Script de inicialización de base de datos PostgreSQL.
 --  Crea schemas, tablas, procedimientos/funciones PL/pgSQL y datos seed.
@@ -199,7 +199,7 @@ INSERT INTO auth.users (id, username, password_hash, first_name, last_name, birt
     ('11111111-1111-1111-1111-111111111111', 'jdoe',      '$2b$10$H1fW6CUC7vnWMv9suX24leTgILRQWwAzgu6EDc/W6ViKF7cXo7mKi', 'Juan',   'Pérez',     '1990-05-14', 'juanp'),
     ('22222222-2222-2222-2222-222222222222', 'mgarcia',   '$2b$10$r32HxnBdjCAtJ4btp3mxEuMwlKWt8hbgUEJ/o3w5IBHBnuFM9JJSu', 'María',  'García',    '1988-11-02', 'mariag'),
     ('33333333-3333-3333-3333-333333333333', 'crodriguez','$2b$10$d0Pxse7UmRNR5O23jlFtleY9SOEosY/QO2XFQAa38oyqa.I47QySu', 'Carlos', 'Rodríguez', '1995-03-21', 'carlosr'),
-    ('44444444-4444-4444-4444-444444444444', 'alopez',    '$2b$10$X9uIHgIEFpfIKLg0j.1qfOWi1j.c5.8kQCCMkOmVu5ifyE2RcAQFW', 'Ana',    'López',     '1992-07-09', 'anal'),
+    ('44444444-4444-4444-4444-444444444444', 'alopez',    '$2b$10$X9uIHgIEFpfIKLg0j.1qfOWi1j.c5.8kQCCMkOmVu5ifyE2RcAQFW', 'Ana',    'López',     '1992-07-09', 'analop'),
     ('55555555-5555-5555-5555-555555555555', 'dmartinez', '$2b$10$ld7PXiiZyS35AC5icKmRFOpSDcuVfq4D8iBiCon3UfW45EOE3SPhi', 'Diego',  'Martínez',  '1985-12-30', 'diegom')
 ON CONFLICT (id) DO NOTHING;
 
@@ -208,7 +208,7 @@ INSERT INTO social.posts (id, author_id, author_alias, message) VALUES
     ('aaaa1111-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', 'juanp',   '¡Hola! Este es mi primer post en la red social de Periferia. 🚀'),
     ('aaaa1111-0000-0000-0000-000000000002', '22222222-2222-2222-2222-222222222222', 'mariag',  'Aprendiendo Angular 22 con Signals, me encanta lo reactivo. ✨'),
     ('aaaa1111-0000-0000-0000-000000000003', '33333333-3333-3333-3333-333333333333', 'carlosr', 'Spring Boot 3 + microservicios = combinación poderosa. 💪'),
-    ('aaaa1111-0000-0000-0000-000000000004', '44444444-4444-4444-4444-444444444444', 'anal',    'Los likes en tiempo real con WebSocket funcionan increíble. ⚡'),
+    ('aaaa1111-0000-0000-0000-000000000004', '44444444-4444-4444-4444-444444444444', 'analop',    'Los likes en tiempo real con WebSocket funcionan increíble. ⚡'),
     ('aaaa1111-0000-0000-0000-000000000005', '55555555-5555-5555-5555-555555555555', 'diegom',  'PostgreSQL con procedures PL/pgSQL, todo bien optimizado. 🐘')
 ON CONFLICT (id) DO NOTHING;
 

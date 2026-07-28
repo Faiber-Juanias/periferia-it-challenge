@@ -9,5 +9,4 @@ public record AuthenticationResult(
     UUID userId,
     String username,
     String alias
-) {
-}
+) { }

@@ -5,6 +5,7 @@ import com.fjuanias.periferiait.authservice.application.port.in.AuthenticateUser
 import com.fjuanias.periferiait.authservice.application.port.in.AuthenticationResult;
 import com.fjuanias.periferiait.authservice.infrastructure.adapter.in.web.dto.LoginRequest;
 import com.fjuanias.periferiait.authservice.infrastructure.adapter.in.web.dto.LoginResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +24,8 @@ public class AuthController {
     this.authenticateUserUseCase = authenticateUserUseCase;
   }
 
+  // Endpoint público: no requiere el bearer global (security = {}).
+  @Operation(summary = "Login — valida credenciales y emite un JWT", security = {})
   @PostMapping("/login")
   public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
     AuthenticationResult result = authenticateUserUseCase.authenticate(
